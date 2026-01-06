@@ -2,24 +2,19 @@ import { useMemo, useState } from 'react'
 import { Button, Input, Picker, Text, View } from '@tarojs/components'
 import { navigateTo, useDidShow, useRouter } from '@tarojs/taro'
 
-import type { EventItem } from '../../types/events'
 import {
   calculateDurationMinutes,
   createRecord,
   loadEvents,
   persistEvents
 } from '../../utils/eventStore'
+import type { EventItem } from '../../types/events'
+import { useEventData } from '../../hooks/useEventData'
+import { formatMinutes } from '../../utils/time'
+import PageHeader from '../../components/PageHeader'
+import HeaderMeta from '../../components/HeaderMeta'
 
 import './index.scss'
-
-const formatMinutes = (minutes: number) => {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  if (!minutes) return '0m'
-  if (!hours) return `${mins}m`
-  if (!mins) return `${hours}h`
-  return `${hours}h ${mins}m`
-}
 
 const replaceEvent = (event: EventItem) => {
   const events = loadEvents()
@@ -31,7 +26,7 @@ export default function EventDetail () {
   const router = useRouter()
   const eventId = Number(router.params?.id || 0)
 
-  const [eventData, setEventData] = useState<EventItem | null>(null)
+  const { eventData, setEventData } = useEventData(eventId)
   const [recordDate, setRecordDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
@@ -97,34 +92,41 @@ export default function EventDetail () {
 
       {eventData ? (
         <>
-          <View className='page-header'>
-            <View className='brand'>
-              <View className='brand-mark'>TT</View>
-              <Text className='brand-name'>{eventData.title}</Text>
-            </View>
-            <View className='header-actions'>
-              <Button
-                className='primary-outline'
-                onClick={handleOpenAnalysis}
-                disabled={!eventData.records.length}
-              >
-                查看分析
-              </Button>
-              <Button
-                className='primary-solid'
-                onClick={openRecordDialog}
-              >
-                保存记录
-              </Button>
-            </View>
-          </View>
+          <PageHeader
+            left={(
+              <View className='brand'>
+                <View className='brand-mark'>TT</View>
+                <Text className='brand-name'>{eventData.title}</Text>
+              </View>
+            )}
+            right={(
+              <View className='header-actions'>
+                <Button
+                  className='primary-outline'
+                  onClick={handleOpenAnalysis}
+                  disabled={!eventData.records.length}
+                >
+                  查看分析
+                </Button>
+                <Button
+                  className='primary-solid'
+                  onClick={openRecordDialog}
+                >
+                  保存记录
+                </Button>
+              </View>
+            )}
+          />
 
-          <View className='header-meta'>
-            <View className='meta-pill'>
-              <View className='meta-dot pending' />
-              <Text className='meta-text'>共 {eventData.records.length} 条记录</Text>
-            </View>
-          </View>
+          <HeaderMeta
+            items={[
+              {
+                key: 'records',
+                text: `共 ${eventData.records.length} 条记录`,
+                tone: 'pending'
+              }
+            ]}
+          />
 
           <View className='panel record-log-panel'>
             <View className='panel-header'>

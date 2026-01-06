@@ -1,35 +1,16 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Text, View } from '@tarojs/components'
-import { useDidShow, useRouter } from '@tarojs/taro'
+import { useRouter } from '@tarojs/taro'
 
-import type { EventItem } from '../../types/events'
-import { loadEvents } from '../../utils/eventStore'
+import { useEventData } from '../../hooks/useEventData'
+import { formatMinutes } from '../../utils/time'
 
 import './index.scss'
-
-const formatMinutes = (minutes: number) => {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  if (!minutes) return '0m'
-  if (!hours) return `${mins}m`
-  if (!mins) return `${hours}h`
-  return `${hours}h ${mins}m`
-}
 
 export default function EventAnalysis () {
   const router = useRouter()
   const eventId = Number(router.params?.id || 0)
-  const [eventData, setEventData] = useState<EventItem | null>(null)
-
-  const refreshEvent = () => {
-    const events = loadEvents()
-    const found = events.find(item => item.id === eventId) || null
-    setEventData(found)
-  }
-
-  useDidShow(() => {
-    refreshEvent()
-  })
+  const { eventData } = useEventData(eventId)
 
   const totalMinutes = useMemo(() => {
     if (!eventData) return 0

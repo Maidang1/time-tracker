@@ -5,6 +5,9 @@ import { navigateTo, useDidShow } from "@tarojs/taro";
 import type { EventItem } from "../../types/events";
 import { createEvent, loadEvents, persistEvents } from "../../utils/eventStore";
 
+import PageHeader from "../../components/PageHeader";
+import HeaderMeta from "../../components/HeaderMeta";
+
 import "./index.scss";
 
 export default function Index() {
@@ -48,25 +51,32 @@ export default function Index() {
     <View className="index">
       <View className="blueprint-surface" />
 
-      <View className="page-header">
-        <View className="brand">
-          <View className="brand-mark">TT</View>
-          <Text className="brand-name">Time Track</Text>
-        </View>
-        <Button
-          className="header-action"
-          onClick={() => setShowCreateDialog(true)}
-        >
-          新建事件
-        </Button>
-      </View>
+      <PageHeader
+        left={
+          <View className="brand">
+            <View className="brand-mark">TT</View>
+            <Text className="brand-name">Time Track</Text>
+          </View>
+        }
+        right={
+          <Button
+            className="header-action"
+            onClick={() => setShowCreateDialog(true)}
+          >
+            新建事件
+          </Button>
+        }
+      />
 
-      <View className="header-meta">
-        <View className="meta-pill">
-          <View className="meta-dot completed" />
-          <Text className="meta-text">{completedCount} 个事件</Text>
-        </View>
-      </View>
+      <HeaderMeta
+        items={[
+          {
+            key: "events",
+            text: `${completedCount} 个事件`,
+            tone: "completed",
+          },
+        ]}
+      />
 
       <View className="panel event-list-panel">
         <View className="panel-header">

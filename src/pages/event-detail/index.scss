@@ -49,6 +49,12 @@ page {
   padding: 0 28rpx;
 }
 
+.page-header_left,
+.page-header_right {
+  display: flex;
+  align-items: center;
+}
+
 .brand {
   display: flex;
   align-items: center;
