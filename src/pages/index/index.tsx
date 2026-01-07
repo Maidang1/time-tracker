@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { View, Text, Input, Button } from "@tarojs/components";
-import Taro, { navigateTo, useDidShow } from "@tarojs/taro";
+import { navigateTo, useDidShow } from "@tarojs/taro";
 
 import type { EventItem } from "../../types/events";
 import {
@@ -22,6 +22,7 @@ export default function Index() {
   const [description, setDescription] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
+  const [pendingDeleteEventId, setPendingDeleteEventId] = useState<number | null>(null);
 
   useDidShow(() => {
     setEvents(loadEvents());
@@ -67,15 +68,14 @@ export default function Index() {
   };
 
   const handleDeleteEvent = (eventId: number) => {
-    Taro.showModal({
-      title: "删除事件",
-      content: "确定要删除该事件吗？",
-      success: (result) => {
-        if (!result.confirm) return;
-        deleteEvent(eventId);
-        setEvents((prev) => prev.filter((item) => item.id !== eventId));
-      },
-    });
+    setPendingDeleteEventId(eventId);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (!pendingDeleteEventId) return;
+    deleteEvent(pendingDeleteEventId);
+    setEvents((prev) => prev.filter((item) => item.id !== pendingDeleteEventId));
+    setPendingDeleteEventId(null);
   };
 
   const goToDetail = (eventId: number) => {
@@ -97,7 +97,7 @@ export default function Index() {
         }
         right={
           <Button className="header-action" onClick={openCreateDialog}>
-            新建事件
+            新建
           </Button>
         }
       />
@@ -182,6 +182,40 @@ export default function Index() {
               />
               <Button className="add-button" onClick={handleCreateEvent}>
                 {editingEventId ? "保存修改" : "保存事件"}
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {pendingDeleteEventId && (
+        <View className="create-dialog">
+          <View
+            className="dialog-mask"
+            onClick={() => setPendingDeleteEventId(null)}
+          />
+          <View className="dialog-card">
+            <View className="dialog-header">
+              <Text className="dialog-title">删除事件</Text>
+              <Button
+                className="dialog-close"
+                onClick={() => setPendingDeleteEventId(null)}
+              >
+                关闭
+              </Button>
+            </View>
+            <View className="confirm-body">
+              <Text>确定要删除该事件吗？删除后无法恢复。</Text>
+            </View>
+            <View className="confirm-actions">
+              <Button
+                className="ghost-button"
+                onClick={() => setPendingDeleteEventId(null)}
+              >
+                取消
+              </Button>
+              <Button className="add-button danger" onClick={confirmDeleteEvent}>
+                删除
               </Button>
             </View>
           </View>

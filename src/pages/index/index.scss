@@ -383,6 +383,38 @@ page {
   margin-right: 0;
 }
 
+.confirm-body {
+  padding: 8rpx 0;
+  font-size: 28rpx;
+  color: var(--color-gray-dark);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.confirm-actions .ghost-button {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 26rpx;
+  border-radius: 999px;
+  outline: none;
+  border:none;
+}
+
+.add-button.danger {
+  flex: 1;
+  background-color: var(--color-orange);
+  box-shadow: 0 12rpx 24rpx #f6821f40;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 999px;
+}
+
 @media screen and (min-width: 640px) {
   .index {
     padding: 40rpx 32rpx 64rpx;

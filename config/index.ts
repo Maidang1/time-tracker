@@ -1,4 +1,5 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
+const { UnifiedWebpackPluginV5 } = require('weapp-tailwindcss/webpack')
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import devConfig from './dev'
 import prodConfig from './prod'
@@ -51,6 +52,18 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.merge({
+        plugin: {
+          install: {
+            plugin: UnifiedWebpackPluginV5,
+            args: [{
+              appType: 'taro',
+              // 下面个配置，会开启 rem -> rpx 的转化
+              rem2rpx: true
+            }]
+          }
+        }
+      })
       }
     },
     h5: {

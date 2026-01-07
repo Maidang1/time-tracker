@@ -86,20 +86,21 @@ page {
 }
 
 .icon-button {
-  width: 72rpx;
-  height: 72rpx;
+  margin-right: 0;
   border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 30rpx;
+  padding: 0 24rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  background-color: var(--color-orange);
+  color: var(--color-white);
+  font-size: 26rpx;
 }
 
 .icon-button.outline {
   border: 2rpx solid var(--color-orange);
   color: var(--color-orange);
   background-color: transparent;
+  outline: none;
 }
 
 .icon-button.outline:disabled {
@@ -113,11 +114,7 @@ page {
   color: var(--color-white);
 }
 
-.icon-button.more {
-  border: 1rpx solid var(--color-black);
-  background-color: transparent;
-  color: var(--color-black);
-}
+
 
 
 .header-meta {
@@ -231,6 +228,7 @@ page {
   font-size: 30rpx;
   height: 96rpx;
   line-height: 96rpx;
+  width: 100%;
 }
 
 .add-button.danger {
@@ -385,6 +383,39 @@ page {
   line-height: 64rpx;
   background-color: transparent;
   font-size: 26rpx;
+  margin-right: 0;
+}
+
+.confirm-body {
+  padding: 8rpx 0;
+  font-size: 28rpx;
+  color: var(--color-gray-dark);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.confirm-actions .ghost-button {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 26rpx;
+  border-radius: 999px;
+  border: none;
+  outline: none;
+}
+
+.add-button.danger {
+  flex: 1;
+  background-color: var(--color-orange);
+  box-shadow: 0 12rpx 24rpx #f6821f40;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 999px;
 }
 
 @media screen and (min-width: 640px) {
