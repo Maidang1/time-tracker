@@ -13,6 +13,12 @@ import {
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
 import SwipeableItem from "../../components/SwipeableItem";
+import DeepSeekConfigDialog from "../../components/DeepSeekConfigDialog";
+import {
+  getDeepSeekConfig,
+  isDeepSeekConfigured,
+  saveDeepSeekConfig,
+} from "../../utils/aiConfig";
 
 import "./index.scss";
 
@@ -23,6 +29,8 @@ export default function Index() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [pendingDeleteEventId, setPendingDeleteEventId] = useState<number | null>(null);
+  const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [configSnapshot, setConfigSnapshot] = useState(getDeepSeekConfig());
 
   useDidShow(() => {
     setEvents(loadEvents());
@@ -84,6 +92,17 @@ export default function Index() {
     });
   };
 
+  const openGlobalInsight = () => {
+    if (!isDeepSeekConfigured()) {
+      setConfigSnapshot(getDeepSeekConfig());
+      setShowConfigDialog(true);
+      return;
+    }
+    navigateTo({
+      url: "/pages/ai-insights/index",
+    });
+  };
+
   return (
     <View className="index">
       <View className="blueprint-surface" />
@@ -96,9 +115,17 @@ export default function Index() {
           </View>
         }
         right={
-          <Button className="header-action" onClick={openCreateDialog}>
-            新建
-          </Button>
+          <View className="header-actions">
+            <Button
+              className="header-action outline"
+              onClick={openGlobalInsight}
+            >
+              AI 洞察
+            </Button>
+            <Button className="header-action" onClick={openCreateDialog}>
+              新建
+            </Button>
+          </View>
         }
       />
 
@@ -221,6 +248,17 @@ export default function Index() {
           </View>
         </View>
       )}
+
+      <DeepSeekConfigDialog
+        open={showConfigDialog}
+        initialConfig={configSnapshot}
+        onClose={() => setShowConfigDialog(false)}
+        onSave={(nextConfig) => {
+          const saved = saveDeepSeekConfig(nextConfig);
+          setConfigSnapshot(saved);
+          setShowConfigDialog(false);
+        }}
+      />
     </View>
   );
 }

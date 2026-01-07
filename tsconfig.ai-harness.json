@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "outDir": "dist/ai-harness",
+    "rootDir": ".",
+    "noEmit": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/utils/aiPrompt.ts",
+    "scripts/aiPromptHarness.ts",
+    "src/types/events.ts"
+  ]
+}

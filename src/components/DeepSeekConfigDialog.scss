@@ -1,0 +1,92 @@
+.config-dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.config-dialog_mask {
+  position: absolute;
+  inset: 0;
+  background-color: #00000060;
+  backdrop-filter: blur(2px);
+}
+
+.config-dialog_card {
+  position: relative;
+  width: min(90vw, 520px);
+  background-color: #ffffff;
+  border: 2rpx solid #1a1a1a;
+  border-radius: 20rpx;
+  box-shadow: 0 30rpx 60rpx #00000025;
+  padding: 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  z-index: 1;
+}
+
+.config-dialog_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.config-dialog_title {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.config-dialog_close {
+  border: 2rpx solid #1a1a1a;
+  border-radius: 999px;
+  padding: 0 20rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background-color: transparent;
+  font-size: 26rpx;
+  margin-right: 0;
+}
+
+.config-dialog_body {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.config-label {
+  font-size: 24rpx;
+  color: #4a4a4a;
+}
+
+.config-input {
+  border: 2rpx solid #1a1a1a;
+  border-radius: 14rpx;
+  padding: 14rpx 18rpx;
+  font-size: 26rpx;
+  background-color: #f5f5f0;
+}
+
+.config-dialog_actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.config-dialog_save {
+  border-radius: 999px;
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 28rpx;
+  font-size: 26rpx;
+  border: 2rpx solid #1a1a1a;
+  background-color: #f6821f;
+  color: #ffffff;
+}

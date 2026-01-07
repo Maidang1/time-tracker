@@ -12,6 +12,7 @@
   "scripts": {
     "prepare": "husky",
     "new": "taro new",
+    "test:ai": "tsc -p tsconfig.ai-harness.json && node dist/ai-harness/scripts/aiPromptHarness.js",
     "postinstall": "weapp-tw patch",
     "build:weapp": "taro build --type weapp",
     "build:swan": "taro build --type swan",

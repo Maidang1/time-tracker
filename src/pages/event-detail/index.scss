@@ -114,6 +114,12 @@ page {
   color: var(--color-white);
 }
 
+.icon-button.more {
+  border: 2rpx solid var(--color-black);
+  background-color: transparent;
+  color: var(--color-black);
+}
+
 
 
 
@@ -384,6 +390,11 @@ page {
   background-color: transparent;
   font-size: 26rpx;
   margin-right: 0;
+}
+
+.ai-dialog-card {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .confirm-body {

@@ -1,19 +1,20 @@
 import { useMemo, useState } from "react";
-import { Button, Icon, Input, Picker, Text, View } from "@tarojs/components";
-import Taro, { navigateTo, useRouter } from "@tarojs/taro";
+import { Button, Input, Picker, Text, View } from "@tarojs/components";
+import Taro, { useRouter } from "@tarojs/taro";
 
-import {
-  calculateDurationMinutes,
-  createRecord,
-  deleteEvent,
-  updateEvent,
-} from "../../utils/eventStore";
+import { calculateDurationMinutes, createRecord, updateEvent } from "../../utils/eventStore";
 import type { EventRecord } from "../../types/events";
 import { useEventData } from "../../hooks/useEventData";
 import { formatMinutes } from "../../utils/time";
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
 import SwipeableItem from "../../components/SwipeableItem";
+import DeepSeekConfigDialog from "../../components/DeepSeekConfigDialog";
+import {
+  getDeepSeekConfig,
+  isDeepSeekConfigured,
+  saveDeepSeekConfig,
+} from "../../utils/aiConfig";
 
 import "./index.scss";
 
@@ -28,16 +29,15 @@ export default function EventDetail() {
   const [note, setNote] = useState("");
   const [showRecordDialog, setShowRecordDialog] = useState(false);
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
-  const [showEventDialog, setShowEventDialog] = useState(false);
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
   const [pendingDeleteRecordId, setPendingDeleteRecordId] = useState<number | null>(null);
-  const [showDeleteEventDialog, setShowDeleteEventDialog] = useState(false);
+  const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [configSnapshot, setConfigSnapshot] = useState(getDeepSeekConfig());
 
   const pendingDuration = useMemo(() => {
     if (!startTime || !endTime) return 0;
     return calculateDurationMinutes(startTime, endTime);
   }, [startTime, endTime]);
+
 
   const openRecordDialog = () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -93,31 +93,6 @@ export default function EventDetail() {
     setPendingDeleteRecordId(recordId);
   };
 
-  const openEventDialog = () => {
-    if (!eventData) return;
-    setEventTitle(eventData.title);
-    setEventDescription(eventData.description);
-    setShowEventDialog(true);
-  };
-
-  const handleSaveEvent = () => {
-    if (!eventData) return;
-    const trimmedTitle = eventTitle.trim();
-    if (!trimmedTitle) return;
-    const updated = {
-      ...eventData,
-      title: trimmedTitle,
-      description: eventDescription.trim(),
-    };
-    updateEvent(updated);
-    setEventData(updated);
-    setShowEventDialog(false);
-  };
-
-  const handleDeleteEvent = () => {
-    setShowDeleteEventDialog(true);
-  };
-
   const confirmDeleteRecord = () => {
     if (!eventData || !pendingDeleteRecordId) return;
     const updated = {
@@ -129,32 +104,21 @@ export default function EventDetail() {
     setPendingDeleteRecordId(null);
   };
 
-  const confirmDeleteEvent = () => {
-    if (!eventData) return;
-    deleteEvent(eventData.id);
-    Taro.navigateBack();
-  };
-
-  const handleMoreActions = () => {
-    Taro.showActionSheet({
-      itemList: ["编辑事件", "删除事件"],
-      success: (result) => {
-        if (result.tapIndex === 0) {
-          openEventDialog();
-          return;
-        }
-        if (result.tapIndex === 1) {
-          handleDeleteEvent();
-        }
-      },
-      fail: (error) => {
-        if (error?.errMsg?.includes("cancel")) return;
-      },
+  const goToEventInsight = () => {
+    if (!eventId) return;
+    if (!isDeepSeekConfigured()) {
+      setConfigSnapshot(getDeepSeekConfig());
+      setShowConfigDialog(true);
+      return;
+    }
+    Taro.navigateTo({
+      url: `/pages/event-ai-insights/index?id=${eventId}`,
     });
   };
 
-  const handleOpenAnalysis = () => {
-    navigateTo({
+  const goToAnalysis = () => {
+    if (!eventId) return;
+    Taro.navigateTo({
       url: `/pages/event-analysis/index?id=${eventId}`,
     });
   };
@@ -187,8 +151,13 @@ export default function EventDetail() {
               <View className="header-actions">
                 <Button
                   className="icon-button outline"
-                  onClick={handleOpenAnalysis}
-                  disabled={!eventData.records.length}
+                  onClick={goToEventInsight}
+                >
+                  <Text>AI 洞察</Text>
+                </Button>
+                <Button
+                  className="icon-button outline"
+                  onClick={goToAnalysis}
                 >
                   <Text>分析</Text>
                 </Button>
@@ -332,43 +301,6 @@ export default function EventDetail() {
         </View>
       )}
 
-      {showEventDialog && (
-        <View className="record-dialog">
-          <View
-            className="dialog-mask"
-            onClick={() => setShowEventDialog(false)}
-          />
-          <View className="dialog-card">
-            <View className="dialog-header">
-              <Text className="dialog-title">编辑事件</Text>
-              <Button
-                className="dialog-close"
-                onClick={() => setShowEventDialog(false)}
-              >
-                关闭
-              </Button>
-            </View>
-            <View className="record-form">
-              <Input
-                value={eventTitle}
-                placeholder="事件标题"
-                className="text-field"
-                onInput={(event) => setEventTitle(event.detail.value)}
-              />
-              <Input
-                value={eventDescription}
-                placeholder="事件描述"
-                className="text-field"
-                onInput={(event) => setEventDescription(event.detail.value)}
-              />
-              <Button className="add-button" onClick={handleSaveEvent}>
-                保存事件
-              </Button>
-            </View>
-          </View>
-        </View>
-      )}
-
       {pendingDeleteRecordId && (
         <View className="record-dialog">
           <View
@@ -403,39 +335,16 @@ export default function EventDetail() {
         </View>
       )}
 
-      {showDeleteEventDialog && (
-        <View className="record-dialog">
-          <View
-            className="dialog-mask"
-            onClick={() => setShowDeleteEventDialog(false)}
-          />
-          <View className="dialog-card">
-            <View className="dialog-header">
-              <Text className="dialog-title">删除事件</Text>
-              <Button
-                className="dialog-close"
-                onClick={() => setShowDeleteEventDialog(false)}
-              >
-                关闭
-              </Button>
-            </View>
-            <View className="confirm-body">
-              <Text>删除后无法恢复，确定继续？</Text>
-            </View>
-            <View className="confirm-actions">
-              <Button
-                className="ghost-button"
-                onClick={() => setShowDeleteEventDialog(false)}
-              >
-                取消
-              </Button>
-              <Button className="add-button danger" onClick={confirmDeleteEvent}>
-                删除
-              </Button>
-            </View>
-          </View>
-        </View>
-      )}
+      <DeepSeekConfigDialog
+        open={showConfigDialog}
+        initialConfig={configSnapshot}
+        onClose={() => setShowConfigDialog(false)}
+        onSave={(nextConfig) => {
+          const saved = saveDeepSeekConfig(nextConfig);
+          setConfigSnapshot(saved);
+          setShowConfigDialog(false);
+        }}
+      />
     </View>
   );
 }
