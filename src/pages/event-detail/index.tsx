@@ -1,10 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { Button, Input, Picker, Text, View } from "@tarojs/components";
-import Taro, { useRouter } from "@tarojs/taro";
+import Taro, { useRouter, useDidShow } from "@tarojs/taro";
 
-import { calculateDurationMinutes, createRecord, updateEvent } from "../../utils/eventStore";
 import type { EventRecord } from "../../types/events";
-import { useEventData } from "../../hooks/useEventData";
 import { formatMinutes } from "../../utils/time";
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
@@ -15,6 +13,7 @@ import {
   isDeepSeekConfigured,
   saveDeepSeekConfig,
 } from "../../utils/aiConfig";
+import DataManager, { type SyncErrorCallback } from "../../services/dataManager";
 
 import "./index.scss";
 
@@ -22,9 +21,10 @@ export default function EventDetail() {
   const router = useRouter();
   const eventId = Number(router.params?.id || 0);
 
-  const { eventData, setEventData } = useEventData(eventId);
-  const [recordDate, setRecordDate] = useState("");
+  const [eventData, setEventData] = useState<any>(null);
+  const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [note, setNote] = useState("");
   const [showRecordDialog, setShowRecordDialog] = useState(false);
@@ -32,16 +32,55 @@ export default function EventDetail() {
   const [pendingDeleteRecordId, setPendingDeleteRecordId] = useState<number | null>(null);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
   const [configSnapshot, setConfigSnapshot] = useState(getDeepSeekConfig());
+  const [isLoading, setIsLoading] = useState(false);
+
+  const showSyncError = useCallback((error: { type: string; message: string }) => {
+    Taro.showToast({
+      title: error.message,
+      icon: 'none',
+      duration: 3000
+    });
+  }, []);
+
+  // 页面加载时获取事件数据
+  useEffect(() => {
+    const event = DataManager.getEventById(eventId);
+    if (event) {
+      setEventData(event);
+    }
+
+    const unsubscribe = DataManager.subscribe(() => {
+      const currentEvent = DataManager.getEventById(eventId);
+      if (currentEvent) {
+        setEventData(currentEvent);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [eventId]);
+
+  useDidShow(() => {
+    DataManager.setSyncErrorCallback(showSyncError);
+  });
 
   const pendingDuration = useMemo(() => {
-    if (!startTime || !endTime) return 0;
-    return calculateDurationMinutes(startTime, endTime);
-  }, [startTime, endTime]);
+    if (!startDate || !startTime || !endDate || !endTime) return 0;
+
+    // 计算跨天时长
+    const start = new Date(`${startDate} ${startTime}`).getTime();
+    const end = new Date(`${endDate} ${endTime}`).getTime();
+    const diffMs = end - start;
+
+    if (diffMs < 0) return 0;
+
+    return Math.floor(diffMs / 1000 / 60); // 转换为分钟
+  }, [startDate, startTime, endDate, endTime]);
 
 
   const openRecordDialog = () => {
     const today = new Date().toISOString().slice(0, 10);
-    setRecordDate(today);
+    setStartDate(today);
+    setEndDate(today);
     setStartTime("");
     setEndTime("");
     setNote("");
@@ -50,7 +89,9 @@ export default function EventDetail() {
   };
 
   const openEditRecordDialog = (record: EventRecord) => {
-    setRecordDate(record.date);
+    // 兼容旧数据格式
+    setStartDate(record.startDate || record.date || "");
+    setEndDate(record.endDate || record.date || "");
     setStartTime(record.startTime);
     setEndTime(record.endTime);
     setNote(record.note);
@@ -58,49 +99,70 @@ export default function EventDetail() {
     setShowRecordDialog(true);
   };
 
-  const handleSaveRecord = () => {
-    if (!eventData || !recordDate || !startTime || !endTime) return;
-    const durationMinutes = calculateDurationMinutes(startTime, endTime);
-    const trimmedNote = note.trim();
-    const record = editingRecordId
-      ? {
+  const handleSaveRecord = async () => {
+    if (!eventData || !startDate || !startTime || !endDate || !endTime) return;
+
+    setIsLoading(true);
+
+    try {
+      if (editingRecordId) {
+        const recordToUpdate = {
           id: editingRecordId,
-          date: recordDate,
+          startDate,
+          endDate,
           startTime,
           endTime,
-          durationMinutes,
-          note: trimmedNote,
-        }
-      : createRecord(recordDate, startTime, endTime, trimmedNote);
-    const updated = {
-      ...eventData,
-      records: editingRecordId
-        ? eventData.records.map((item) =>
-            item.id === editingRecordId ? record : item
-          )
-        : [record, ...eventData.records],
-    };
-    updateEvent(updated);
-    setEventData(updated);
-    setStartTime("");
-    setEndTime("");
-    setNote("");
-    setShowRecordDialog(false);
-    setEditingRecordId(null);
+          durationMinutes: pendingDuration,
+          note: note.trim(),
+          createdAt: eventData.records.find(r => r.id === editingRecordId)?.createdAt || new Date().toISOString(),
+          date: startDate,
+        };
+
+        await DataManager.updateRecord(eventId, recordToUpdate);
+      } else {
+        const recordData = {
+          startDate,
+          endDate,
+          startTime,
+          endTime,
+          durationMinutes: pendingDuration,
+          note: note.trim(),
+          date: startDate,
+        };
+
+        await DataManager.createRecord(eventId, recordData);
+      }
+
+      setStartDate("");
+      setEndDate("");
+      setStartTime("");
+      setEndTime("");
+      setNote("");
+      setShowRecordDialog(false);
+      setEditingRecordId(null);
+    } finally {
+      setIsLoading(false);
+      Taro.hideLoading();
+    }
   };
 
   const handleDeleteRecord = (recordId: number) => {
     setPendingDeleteRecordId(recordId);
   };
 
-  const confirmDeleteRecord = () => {
+  const confirmDeleteRecord = async () => {
     if (!eventData || !pendingDeleteRecordId) return;
-    const updated = {
-      ...eventData,
-      records: eventData.records.filter((item) => item.id !== pendingDeleteRecordId),
-    };
-    updateEvent(updated);
-    setEventData(updated);
+
+    setIsLoading(true);
+    Taro.showLoading({ title: '删除中...' });
+
+    try {
+      await DataManager.deleteRecord(eventId, pendingDeleteRecordId);
+    } finally {
+      setIsLoading(false);
+      Taro.hideLoading();
+    }
+
     setPendingDeleteRecordId(null);
   };
 
@@ -123,6 +185,7 @@ export default function EventDetail() {
     });
   };
 
+
   if (!eventId) {
     return (
       <View className="event-detail">
@@ -143,7 +206,7 @@ export default function EventDetail() {
           <PageHeader
             left={
               <View className="brand">
-                <View className="brand-mark">TT</View>
+                <View className="brand-mark">CP</View>
                 <Text className="brand-name">{eventData.title}</Text>
               </View>
             }
@@ -207,8 +270,11 @@ export default function EventDetail() {
                     <View className="record-dot" />
                     <View className="record-row">
                       <Text className="record-time">
-                        {record.date ? `${record.date} ` : ""}
-                        {record.startTime} — {record.endTime}
+                        {record.startDate || record.date} {record.startTime}
+                        {(record.endDate && record.endDate !== (record.startDate || record.date))
+                          ? ` — ${record.endDate} ${record.endTime}`
+                          : ` — ${record.endTime}`
+                        }
                       </Text>
                       <Text className="record-duration">
                         {formatMinutes(record.durationMinutes)}
@@ -256,11 +322,11 @@ export default function EventDetail() {
             <View className="record-form">
               <Picker
                 mode="date"
-                value={recordDate}
-                onChange={(event) => setRecordDate(event.detail.value)}
+                value={startDate}
+                onChange={(event) => setStartDate(event.detail.value)}
               >
                 <View className="picker-field">
-                  <Text>{recordDate || "选择日期"}</Text>
+                  <Text>{startDate || "开始日期"}</Text>
                 </View>
               </Picker>
               <Picker
@@ -270,6 +336,15 @@ export default function EventDetail() {
               >
                 <View className="picker-field">
                   <Text>{startTime || "开始时间 08:30"}</Text>
+                </View>
+              </Picker>
+              <Picker
+                mode="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.detail.value)}
+              >
+                <View className="picker-field">
+                  <Text>{endDate || "结束日期"}</Text>
                 </View>
               </Picker>
               <Picker
@@ -293,7 +368,7 @@ export default function EventDetail() {
                   {pendingDuration ? formatMinutes(pendingDuration) : "—"}
                 </Text>
               </View>
-              <Button className="add-button" onClick={handleSaveRecord}>
+              <Button className="add-button" onClick={handleSaveRecord} loading={isLoading}>
                 {editingRecordId ? "保存修改" : "保存记录"}
               </Button>
             </View>
@@ -327,7 +402,7 @@ export default function EventDetail() {
               >
                 取消
               </Button>
-              <Button className="add-button danger" onClick={confirmDeleteRecord}>
+              <Button className="add-button danger" onClick={confirmDeleteRecord} loading={isLoading}>
                 删除
               </Button>
             </View>

@@ -1,14 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import Taro from "@tarojs/taro";
 import { View, Text, Input, Button } from "@tarojs/components";
 import { navigateTo, useDidShow } from "@tarojs/taro";
 
 import type { EventItem } from "../../types/events";
-import {
-  createEvent,
-  deleteEvent,
-  loadEvents,
-  persistEvents,
-} from "../../utils/eventStore";
+import DataManager, { type SyncErrorCallback } from "../../services/dataManager";
 
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
@@ -33,9 +29,45 @@ export default function Index() {
   const [configSnapshot, setConfigSnapshot] = useState(getDeepSeekConfig());
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const [syncError, setSyncError] = useState<{ type: string; message: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useDidShow(() => {
-    setEvents(loadEvents());
+  const refreshEvents = () => {
+    const currentEvents = DataManager.getAllEvents();
+    console.log('[Index] refreshEvents called, events count:', currentEvents.length);
+    console.log('[Index] events data:', JSON.stringify(currentEvents, null, 2));
+    setEvents(currentEvents);
+  };
+
+  const showSyncError = useCallback((error: { type: string; message: string }) => {
+    setSyncError(error);
+    Taro.showToast({
+      title: error.message,
+      icon: 'none',
+      duration: 3000
+    });
+  }, []);
+
+  useDidShow(async () => {
+    console.log('[Index] useDidShow called');
+    
+    DataManager.setSyncErrorCallback(showSyncError);
+    
+    try {
+      console.log('[Index] waiting for DataManager initialization...');
+      await DataManager.waitForInitialization();
+      console.log('[Index] DataManager initialized, refreshing events...');
+      refreshEvents();
+    } catch (error) {
+      console.error('[Index] DataManager initialization failed:', error);
+      refreshEvents();
+    }
+    
+    const unsubscribe = DataManager.subscribe(() => {
+      console.log('[Index] DataManager subscription triggered');
+      refreshEvents();
+    });
+    return unsubscribe;
   });
 
   const { completedCount } = useMemo(() => {
@@ -44,23 +76,37 @@ export default function Index() {
     };
   }, [events]);
 
-  const handleCreateEvent = () => {
+  const handleCreateEvent = async () => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;
 
-    const nextEvents = editingEventId
-      ? events.map((event) =>
-          event.id === editingEventId
-            ? { ...event, title: trimmedTitle, description: description.trim() }
-            : event
-        )
-      : [createEvent(trimmedTitle, description.trim()), ...events];
-    persistEvents(nextEvents);
-    setEvents(nextEvents);
-    setTitle("");
-    setDescription("");
-    setShowCreateDialog(false);
-    setEditingEventId(null);
+    setIsLoading(true);
+
+    try {
+      if (editingEventId) {
+        const eventToUpdate = DataManager.getEventById(editingEventId);
+        if (eventToUpdate) {
+          const updatedEvent = {
+            ...eventToUpdate,
+            title: trimmedTitle,
+            description: description.trim()
+          };
+          await DataManager.updateEvent(updatedEvent);
+          refreshEvents();
+        }
+      } else {
+        await DataManager.createEvent(trimmedTitle, description.trim());
+        refreshEvents();
+      }
+
+      setTitle("");
+      setDescription("");
+      setShowCreateDialog(false);
+      setEditingEventId(null);
+    } finally {
+      setIsLoading(false);
+      Taro.hideLoading();
+    }
   };
 
   const openCreateDialog = () => {
@@ -81,10 +127,20 @@ export default function Index() {
     setPendingDeleteEventId(eventId);
   };
 
-  const confirmDeleteEvent = () => {
+  const confirmDeleteEvent = async () => {
     if (!pendingDeleteEventId) return;
-    deleteEvent(pendingDeleteEventId);
-    setEvents((prev) => prev.filter((item) => item.id !== pendingDeleteEventId));
+
+    setIsLoading(true);
+    Taro.showLoading({ title: '删除中...' });
+
+    try {
+      await DataManager.deleteEvent(pendingDeleteEventId);
+      refreshEvents();
+    } finally {
+      setIsLoading(false);
+      Taro.hideLoading();
+    }
+
     setPendingDeleteEventId(null);
   };
 
@@ -127,8 +183,8 @@ export default function Index() {
       <PageHeader
         left={
           <View className="brand">
-            <View className="brand-mark">TT</View>
-            <Text className="brand-name">Time Track</Text>
+            <View className="brand-mark">CP</View>
+            <Text className="brand-name">Chrono Pulse</Text>
           </View>
         }
         right={
@@ -227,7 +283,7 @@ export default function Index() {
                 className="text-field"
                 onInput={(event) => setDescription(event.detail.value)}
               />
-              <Button className="add-button" onClick={handleCreateEvent}>
+              <Button className="add-button" onClick={handleCreateEvent} loading={isLoading}>
                 {editingEventId ? "保存修改" : "保存事件"}
               </Button>
             </View>
@@ -261,7 +317,7 @@ export default function Index() {
               >
                 取消
               </Button>
-              <Button className="add-button danger" onClick={confirmDeleteEvent}>
+              <Button className="add-button danger" onClick={confirmDeleteEvent} loading={isLoading}>
                 删除
               </Button>
             </View>

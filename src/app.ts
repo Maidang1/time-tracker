@@ -1,17 +1,22 @@
-import { PropsWithChildren } from 'react'
+import { useEffect } from 'react'
 import { useLaunch } from '@tarojs/taro'
 
+import { initCloud } from './services/databaseService'
+import DataManager from './services/dataManager'
 import './app.scss'
 
-function App({ children }: PropsWithChildren<any>) {
-  useLaunch(() => {
+export default function App({ children }: { children: React.ReactNode }) {
+  useLaunch(async () => {
     console.log('App launched.')
+    initCloud()
+
+    try {
+      await DataManager.initialize()
+      console.log('数据管理器初始化成功')
+    } catch (error) {
+      console.error('数据管理器初始化失败:', error)
+    }
   })
 
-  // children 是将要会渲染的页面
   return children
 }
-  
-
-
-export default App

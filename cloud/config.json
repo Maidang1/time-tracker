@@ -1,0 +1,11 @@
+{
+  "functions": [
+    {
+      "name": "login",
+      "entry": ".",
+      "runtime": "Nodejs18.15",
+      "memorySize": 128,
+      "timeout": 60
+    }
+  ]
+}

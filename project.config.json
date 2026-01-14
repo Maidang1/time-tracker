@@ -1,8 +1,9 @@
 {
   "miniprogramRoot": "./dist",
-  "projectname": "time-track",
+  "projectname": "chrono-pulse",
   "description": "事件记录器",
   "appid": "wxcab2e20c0cb2c857",
+  "cloudfunctionRoot": "cloud/functions/",
   "setting": {
     "urlCheck": true,
     "es6": false,

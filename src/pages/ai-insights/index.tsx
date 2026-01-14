@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { Button, Text, View } from "@tarojs/components";
 import { navigateBack, useDidShow } from "@tarojs/taro";
 
 import type { EventItem } from "../../types/events";
-import { loadEvents } from "../../utils/eventStore";
+import DataManager from "../../services/dataManager";
 import { formatMinutes } from "../../utils/time";
 import {
   buildGlobalEventContext,
@@ -26,9 +26,20 @@ export default function AiInsightsPage() {
   const [globalInsight, setGlobalInsight] = useState<AiInsightResult | null>(null);
   const deepSeekEnabled = isDeepSeekEnabled();
 
-  useDidShow(() => {
-    setEvents(loadEvents());
-  });
+  // 在组件挂载时从数据管理器获取初始数据并监听变化
+  useEffect(() => {
+    // 获取当前所有事件
+    const initialEvents = DataManager.getAllEvents();
+    setEvents(initialEvents);
+
+    // 订阅数据变化
+    const unsubscribe = DataManager.subscribe(() => {
+      const currentEvents = DataManager.getAllEvents();
+      setEvents(currentEvents);
+    });
+
+    return () => unsubscribe(); // 清理订阅
+  }, []);
 
   const { completedCount } = useMemo(() => {
     return {
@@ -69,12 +80,13 @@ export default function AiInsightsPage() {
       if (!events.length) {
         throw new Error("需要至少 1 个事件才能生成分析");
       }
+
       const prompt = composeInsightPrompt({
         baseInstruction: GLOBAL_INSIGHT_INSTRUCTION,
         context: globalContext,
         userPrompt,
       });
-      return fetchAiInsight({
+      return await fetchAiInsight({
         scope: "allEvents",
         prompt,
       });
@@ -89,7 +101,7 @@ export default function AiInsightsPage() {
       <PageHeader
         left={
           <View className="brand">
-            <View className="brand-mark">AI</View>
+            <View className="brand-mark">CP</View>
             <Text className="brand-name">AI 洞察</Text>
           </View>
         }

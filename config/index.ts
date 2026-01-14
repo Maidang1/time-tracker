@@ -7,7 +7,7 @@ import prodConfig from './prod'
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
   const baseConfig: UserConfigExport<'webpack5'> = {
-    projectName: 'time-track',
+    projectName: 'chrono-pulse',
     date: '2026-1-6',
     designWidth: 750,
     deviceRatio: {
@@ -22,6 +22,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       "@tarojs/plugin-generator"
     ],
     defineConstants: {
+      CLOUD_ENV_ID: JSON.stringify(process.env.CLOUD_ENV_ID || ''),
     },
     copy: {
       patterns: [

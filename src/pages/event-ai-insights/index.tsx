@@ -78,12 +78,13 @@ export default function EventAiInsightsPage() {
       if (!eventData.records.length) {
         throw new Error("至少添加 1 条记录后再请求分析");
       }
+
       const prompt = composeInsightPrompt({
         baseInstruction: EVENT_INSIGHT_INSTRUCTION,
         context: eventContext,
         userPrompt,
       });
-      return fetchAiInsight({
+      return await fetchAiInsight({
         scope: "event",
         prompt,
       });
@@ -109,7 +110,7 @@ export default function EventAiInsightsPage() {
       <PageHeader
         left={
           <View className="brand">
-            <View className="brand-mark">AI</View>
+            <View className="brand-mark">CP</View>
             <Text className="brand-name">AI 洞察</Text>
           </View>
         }

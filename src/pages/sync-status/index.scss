@@ -1,0 +1,71 @@
+.sync-status-page {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sync-content {
+  width: 100%;
+  max-width: 400px;
+}
+
+.sync-prompt,
+.sync-progress,
+.sync-success,
+.sync-error {
+  text-align: center;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.sync-title {
+  font-size: 24px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.sync-message {
+  display: block;
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.error-message {
+  color: #f00;
+  font-size: 14px;
+}
+
+.sync-button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+}
+
+.primary {
+  background-color: #007aff;
+  color: white;
+}
+
+.secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.sync-success .sync-title {
+  color: #4cd964;
+  font-size: 48px;
+}
+
+.info-text {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
