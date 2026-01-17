@@ -53,7 +53,7 @@ const truncateNote = (note: string) => {
 
 const aggregateRecords = (records: EventRecord[], limit = MAX_RECORDS_PER_EVENT): AggregatedEventRecord[] => {
   return records.slice(0, limit).map(record => ({
-    date: record.date,
+    date: record.date ?? Date.now().toString(),
     durationMinutes: record.durationMinutes,
     note: truncateNote(record.note)
   }))

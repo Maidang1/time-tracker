@@ -37,12 +37,26 @@ export default function Index() {
     setEvents(currentEvents);
   };
 
-  const showSyncError = useCallback((error: { type: string; message: string }) => {
+  const showSyncError = useCallback((error: { type: string; message: string; retry?: () => Promise<void> }) => {
     setSyncError(error);
-    Taro.showToast({
-      title: error.message,
-      icon: 'none',
-      duration: 3000
+    Taro.showModal({
+      title: '同步失败',
+      content: error.message,
+      confirmText: '重试',
+      cancelText: '忽略',
+      success: async (res) => {
+        if (res.confirm && error.retry) {
+          Taro.showLoading({ title: '重试中...' });
+          try {
+            await error.retry();
+            Taro.showToast({ title: '重试请求已提交', icon: 'none' });
+          } catch (e) {
+            console.error('Retry failed:', e);
+          } finally {
+            Taro.hideLoading();
+          }
+        }
+      }
     });
   }, []);
 
