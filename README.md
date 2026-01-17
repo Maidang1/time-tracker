@@ -9,20 +9,15 @@ pnpm install
 pnpm run dev:weapp # 或 dev:h5
 ```
 
-## DeepSeek AI 洞察配置
+<p align="left">
+<img width="300" height="auto" alt="image" src="https://github.com/user-attachments/assets/e3f11f98-daa3-4e8a-84f2-3eca2970e4a3" />
+<img width="300" height="auto" alt="image" src="https://github.com/user-attachments/assets/8fc5c3ed-1a08-4b9d-b944-cd6c7acc1f23" />
+</p>
 
-1. 申请 DeepSeek API Key，并确认可访问 `https://api.deepseek.com`。
-2. 在 `.env.development`、`.env.production` 等环境文件中设置：
-   ```bash
-   DEEPSEEK_API_KEY="你的 key"
-   DEEPSEEK_API_BASE="https://api.deepseek.com"
-   DEEPSEEK_MODEL="deepseek-chat"
-   ```
-3. 运行 `pnpm run test:ai`，验证提示词构造与错误归一逻辑是否正常。
-4. 启动开发命令后，首页与事件详情页会出现「AI 洞察」面板，若缺少 Key 则会显示禁用提示。
+<p align="left">
+<img width="300" height="auto" alt="image" src="https://github.com/user-attachments/assets/51466f7b-2425-4de3-9697-744ee9b11109" />
+<img width="300" height="auto" alt="image" src="https://github.com/user-attachments/assets/6b56ad5d-3621-49bf-ae2c-30049da6488e" />
+</p>
 
-## AI 洞察快速验证
 
-- 首页卡片会汇总最近事件，分析整体类型、心情与建议。
-- 事件详情卡片会分析该事件的记录趋势，并给出投入程度反馈。
-- 两个入口均允许输入自定义提示词并在 DeepSeek 输出中标注来源。
+
