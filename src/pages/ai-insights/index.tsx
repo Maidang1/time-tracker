@@ -19,8 +19,6 @@ import {
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
 
-import "./index.scss";
-
 export default function AiInsightsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [globalInsight, setGlobalInsight] = useState<AiInsightResult | null>(null);
@@ -95,19 +93,20 @@ export default function AiInsightsPage() {
   );
 
   return (
-    <View className="ai-insights">
-      <View className="blueprint-surface" />
+    <View className="min-h-screen w-full px-[24rpx] py-[32rpx] sm:px-[32rpx] sm:py-[40rpx] pb-[48rpx] sm:pb-[64rpx] bg-[#f5f5f0] text-[#1a1a1a] font-sans relative box-border flex flex-col gap-[24rpx]">
+      <View className="absolute inset-0 bg-[#f5f5f0] opacity-70 z-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(90deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(-45deg,transparent,transparent_3px,#0000001a_3px,#0000001a_4px)]" />
 
       <PageHeader
+        className="px-[8rpx]"
         left={
-          <View className="brand">
-            <View className="brand-mark">CP</View>
-            <Text className="brand-name">AI 洞察</Text>
+          <View className="flex items-center gap-[12rpx]">
+            <View className="w-[64rpx] h-[64rpx] rounded-[18rpx] border-[2rpx] border-[#1a1a1a] flex items-center justify-center text-[26rpx] font-bold bg-[#ffffff]">CP</View>
+            <Text className="text-[32rpx] font-semibold">AI 洞察</Text>
           </View>
         }
         right={
-          <View className="header-actions">
-            <Button className="header-action outline" onClick={() => navigateBack()}>
+          <View className="flex items-center gap-[12rpx]">
+            <Button className="mr-0 border-[2rpx] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]" onClick={() => navigateBack()}>
               返回
             </Button>
           </View>
@@ -115,6 +114,7 @@ export default function AiInsightsPage() {
       />
 
       <HeaderMeta
+        className="px-[8rpx]"
         items={[
           {
             key: "events",
@@ -124,7 +124,7 @@ export default function AiInsightsPage() {
         ]}
       />
 
-      <View className="panel ai-insights-panel">
+      <View className="relative z-[1] mt-[8rpx]">
         <AiInsightCard
           title="AI 洞察"
           description="分析所有事件方向，推测心情和偏好，并给出建议。"

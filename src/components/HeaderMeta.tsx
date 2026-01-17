@@ -18,15 +18,15 @@ type HeaderMetaProps = {
 
 export default function HeaderMeta ({ items, className }: HeaderMetaProps) {
   return (
-    <View className={`header-meta${className ? ` ${className}` : ''}`}>
+    <View className={`flex gap-[16rpx] relative z-[1]${className ? ` ${className}` : ''}`}>
       {items.map(item => (
         <View
           key={item.key}
-          className={`meta-pill${item.className ? ` ${item.className}` : ''}`}
+          className={`flex items-center gap-[8rpx] px-[16rpx] py-[8rpx] border-[2rpx] border-[#1a1a1a] rounded-[999px] bg-[#ffffff]${item.className ? ` ${item.className}` : ''}`}
           onClick={item.onClick}
         >
-          <View className={`meta-dot ${item.tone ?? 'neutral'}`} />
-          <Text className='meta-text'>{item.text}</Text>
+          <View className={`w-[14rpx] h-[14rpx] rounded-full ${item.tone === 'pending' ? 'bg-[#f08c26]' : item.tone === 'completed' ? 'bg-[#28b463]' : 'bg-[#888888]'}`} />
+          <Text className='text-[24rpx] text-[#1a1a1a]'>{item.text}</Text>
         </View>
       ))}
     </View>

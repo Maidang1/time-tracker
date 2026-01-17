@@ -9,9 +9,9 @@ type PageHeaderProps = {
 
 export default function PageHeader ({ left, right, className }: PageHeaderProps) {
   return (
-    <View className={`page-header${className ? ` ${className}` : ''}`}>
-      <View className='page-header_left'>{left}</View>
-      {right ? <View className='page-header_right'>{right}</View> : null}
+    <View className={`flex items-center justify-between gap-[16rpx] relative z-[1]${className ? ` ${className}` : ''}`}>
+      <View className='flex items-center'>{left}</View>
+      {right ? <View className='flex items-center'>{right}</View> : null}
     </View>
   )
 }

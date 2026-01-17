@@ -22,7 +22,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       "@tarojs/plugin-generator"
     ],
     defineConstants: {
-      CLOUD_ENV_ID: JSON.stringify(process.env.CLOUD_ENV_ID || ''),
+      CLOUD_ENV_ID: JSON.stringify(process.env.WECHAT_CLOUD_ENV_ID || ''),
     },
     copy: {
       patterns: [

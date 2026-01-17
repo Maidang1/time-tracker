@@ -3,8 +3,6 @@ import { Button, Text, Textarea, View } from '@tarojs/components'
 
 import type { AiInsightResult } from '../services/aiClient'
 
-import './AiInsightCard.scss'
-
 type AiInsightCardProps = {
   title: string
   description?: string
@@ -76,42 +74,42 @@ export default function AiInsightCard ({
   }
 
   return (
-    <View className={`ai-card${className ? ` ${className}` : ''}`}>
-      <View className='ai-card_header'>
+    <View className={`relative z-[1] border-[2rpx] border-[#1a1a1a] rounded-[22rpx] p-[28rpx] sm:p-[32rpx] bg-[#ffffff] shadow-[0_18rpx_36rpx_#00000012] flex flex-col gap-[24rpx]${className ? ` ${className}` : ''}`}>
+      <View className='flex justify-between gap-[16rpx]'>
         <View>
-          <Text className='ai-card_title'>{title}</Text>
-          {description ? <Text className='ai-card_description'>{description}</Text> : null}
+          <Text className='text-[36rpx] font-semibold leading-[1.3]'>{title}</Text>
+          {description ? <Text className='mt-[8rpx] text-[26rpx] text-[#4a4a4a] block leading-[1.5]'>{description}</Text> : null}
         </View>
-        <View className='ai-card_badge'>来自 {badgeLabel}</View>
+        <View className='self-start border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] py-[8rpx] text-[24rpx] font-medium bg-[#f5f5f0]'>来自 {badgeLabel}</View>
       </View>
 
-      {extraContent ? <View className='ai-card_context'>{extraContent}</View> : null}
+      {extraContent ? <View className='flex flex-wrap gap-[12rpx]'>{extraContent}</View> : null}
 
-      <View className='ai-card_prompt'>
+      <View className='flex flex-col gap-[12rpx]'>
         <Textarea
           value={prompt}
           placeholder={placeholder}
-          className='ai-card_textarea'
+          className='min-h-[140rpx] border-[2rpx] border-[#1a1a1a] rounded-[18rpx] px-[20rpx] py-[16rpx] text-[28rpx] bg-[#f5f5f0]'
           onInput={event => setPrompt(event.detail.value)}
           maxlength={400}
         />
         {disabled && disabledReason ? (
-          <Text className='ai-card_hint'>{disabledReason}</Text>
+          <Text className='text-[24rpx] text-[#888888]'>{disabledReason}</Text>
         ) : (
-          <Text className='ai-card_hint'>补充你关心的角度，空着也可以直接分析。</Text>
+          <Text className='text-[24rpx] text-[#888888]'>补充你关心的角度，空着也可以直接分析。</Text>
         )}
       </View>
 
-      <View className='ai-card_actions'>
+      <View className='flex gap-[16rpx]'>
         <Button
-          className='ai-card_button ghost'
+          className='flex-1 rounded-[16rpx] border-[2rpx] border-[#1a1a1a] text-[28rpx] h-[90rpx] leading-[90rpx] bg-transparent text-[#1a1a1a] disabled:opacity-60'
           onClick={handleReset}
           disabled={isLoading}
         >
           {resetLabel}
         </Button>
         <Button
-          className='ai-card_button solid'
+          className='flex-1 rounded-[16rpx] border-[2rpx] border-[#1a1a1a] text-[28rpx] h-[90rpx] leading-[90rpx] bg-[#f6821f] text-[#ffffff] shadow-[0_12rpx_22rpx_#f6821f33] disabled:opacity-60'
           onClick={handleGenerate}
           disabled={disabled || isLoading}
         >
@@ -120,24 +118,24 @@ export default function AiInsightCard ({
       </View>
 
       {isLoading ? (
-        <View className='ai-card_status'>正在召唤 DeepSeek…</View>
+        <View className='text-[26rpx] text-[#4a4a4a]'>正在召唤 DeepSeek…</View>
       ) : null}
 
-      {error ? <View className='ai-card_error'>{error}</View> : null}
+      {error ? <View className='border-[2rpx] border-[#d93025] rounded-[14rpx] px-[20rpx] py-[16rpx] text-[#d93025] text-[26rpx]'>{error}</View> : null}
 
       {result ? (
-        <View className='ai-card_response'>
-          <View className='ai-card_response-meta'>
+        <View className='border-[2rpx] dashed border-[#1a1a1a] rounded-[18rpx] p-[20rpx] flex flex-col gap-[12rpx] bg-[#fcfbf7]'>
+          <View className='text-[24rpx] text-[#4a4a4a]'>
             <Text>最新结果 · {new Date(result.createdAt).toLocaleString()}</Text>
           </View>
-          <View className='ai-card_response-text'>
+          <View className='flex flex-col gap-[12rpx]'>
             {paragraphs.length
               ? paragraphs.map((paragraph, index) => (
-                  <Text key={index} className='ai-card_paragraph'>
+                  <Text key={index} className='text-[28rpx] leading-[1.6] text-[#1a1a1a]'>
                     {paragraph}
                   </Text>
                 ))
-              : <Text className='ai-card_paragraph'>{result.content}</Text>}
+              : <Text className='text-[28rpx] leading-[1.6] text-[#1a1a1a]'>{result.content}</Text>}
           </View>
         </View>
       ) : null}

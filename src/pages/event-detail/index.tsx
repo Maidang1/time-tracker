@@ -15,8 +15,6 @@ import {
 } from "../../utils/aiConfig";
 import DataManager, { type SyncErrorCallback } from "../../services/dataManager";
 
-import "./index.scss";
-
 export default function EventDetail() {
   const router = useRouter();
   const eventId = Number(router.params?.id || 0);

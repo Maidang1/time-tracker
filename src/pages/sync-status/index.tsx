@@ -3,8 +3,6 @@ import { navigateBack, reLaunch } from '@tarojs/taro';
 import { useEffect, useState } from 'react';
 import DataManager from '../../services/dataManager';
 
-import './index.scss';
-
 export default function SyncStatusPage() {
   const [syncing, setSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);

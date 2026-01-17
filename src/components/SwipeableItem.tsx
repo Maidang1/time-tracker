@@ -2,8 +2,6 @@ import { PropsWithChildren, useMemo, useRef, useState } from 'react'
 import { View } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 
-import './SwipeableItem.scss'
-
 type SwipeAction = {
   text: string
   type?: 'default' | 'danger'
@@ -66,9 +64,9 @@ export default function SwipeableItem ({
   }
 
   return (
-    <View className='swipe-item'>
+    <View className='relative overflow-hidden rounded-[18rpx]'>
       <View
-        className='swipe-item_content'
+        className='relative z-[2] rounded-[18rpx] overflow-hidden'
         style={{
           transform: `translateX(${offsetRpx}rpx)`,
           transition: dragging ? 'none' : 'transform 0.2s ease'
@@ -80,7 +78,7 @@ export default function SwipeableItem ({
         {children}
       </View>
       <View
-        className='swipe-item_actions'
+        className='absolute top-0 right-0 bottom-0 flex items-stretch z-[1] rounded-[18rpx] overflow-hidden'
         style={{
           width: `${maxOffset}rpx`
         }}
@@ -88,7 +86,11 @@ export default function SwipeableItem ({
         {actions.map(action => (
           <View
             key={action.text}
-            className={`swipe-item_action ${action.type ?? 'default'}`}
+            className={`flex items-center justify-center text-[26rpx] text-[#1a1a1a] bg-[#f5f5f0] border-l-[1rpx] border-[#e0e0e0] ${
+              action.type === 'danger'
+                ? 'text-[#ffffff] bg-[#f4333c]'
+                : ''
+            }`}
             style={{ width: `${actionWidthRpx}rpx` }}
             onClick={() => handleAction(action)}
           >

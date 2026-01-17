@@ -19,8 +19,6 @@ import { getCachedEventInsight, setCachedEventInsight } from "../../utils/aiCach
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
 
-import "./index.scss";
-
 export default function EventAiInsightsPage() {
   const router = useRouter();
   const eventId = Number(router.params?.id || 0);
@@ -94,9 +92,9 @@ export default function EventAiInsightsPage() {
 
   if (!eventId) {
     return (
-      <View className="event-ai-insights">
-        <View className="blueprint-surface" />
-        <View className="empty-state">
+      <View className="min-h-screen w-full px-[24rpx] py-[32rpx] sm:px-[32rpx] sm:py-[40rpx] pb-[48rpx] sm:pb-[64rpx] bg-[#f5f5f0] text-[#1a1a1a] font-sans relative box-border flex flex-col gap-[24rpx]">
+        <View className="absolute inset-0 bg-[#f5f5f0] opacity-70 z-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(90deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(-45deg,transparent,transparent_3px,#0000001a_3px,#0000001a_4px)]" />
+        <View className="border-[2rpx] dashed border-[#888888] rounded-[16rpx] p-[28rpx] text-[#4a4a4a] text-center bg-[#ffffff] text-[26rpx] leading-[1.5] relative z-[1]">
           <Text>缺少事件 ID，请返回上一页。</Text>
         </View>
       </View>
@@ -104,19 +102,20 @@ export default function EventAiInsightsPage() {
   }
 
   return (
-    <View className="event-ai-insights">
-      <View className="blueprint-surface" />
+    <View className="min-h-screen w-full px-[24rpx] py-[32rpx] sm:px-[32rpx] sm:py-[40rpx] pb-[48rpx] sm:pb-[64rpx] bg-[#f5f5f0] text-[#1a1a1a] font-sans relative box-border flex flex-col gap-[24rpx]">
+      <View className="absolute inset-0 bg-[#f5f5f0] opacity-70 z-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(90deg,transparent,transparent_60px,#dcdcdc_61px),repeating-linear-gradient(-45deg,transparent,transparent_3px,#0000001a_3px,#0000001a_4px)]" />
 
       <PageHeader
+        className="px-[8rpx]"
         left={
-          <View className="brand">
-            <View className="brand-mark">CP</View>
-            <Text className="brand-name">AI 洞察</Text>
+          <View className="flex items-center gap-[12rpx]">
+            <View className="w-[64rpx] h-[64rpx] rounded-[18rpx] border-[2rpx] border-[#1a1a1a] flex items-center justify-center text-[26rpx] font-bold bg-[#ffffff]">CP</View>
+            <Text className="text-[32rpx] font-semibold">AI 洞察</Text>
           </View>
         }
         right={
-          <View className="header-actions">
-            <Button className="header-action outline" onClick={() => navigateBack()}>
+          <View className="flex items-center gap-[12rpx]">
+            <Button className="mr-0 border-[2rpx] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]" onClick={() => navigateBack()}>
               返回
             </Button>
           </View>
@@ -126,6 +125,7 @@ export default function EventAiInsightsPage() {
       {eventData ? (
         <>
           <HeaderMeta
+            className="px-[8rpx]"
             items={[
               {
                 key: "records",
@@ -135,7 +135,7 @@ export default function EventAiInsightsPage() {
             ]}
           />
 
-          <View className="panel event-ai-panel">
+          <View className="relative z-[1] mt-[8rpx]">
             <AiInsightCard
               title="AI 洞察投入程度"
               description="让 DeepSeek 根据该事件的记录趋势评估投入度与建议。"
@@ -152,7 +152,7 @@ export default function EventAiInsightsPage() {
           </View>
         </>
       ) : (
-        <View className="empty-state">
+        <View className="border-[2rpx] dashed border-[#888888] rounded-[16rpx] p-[28rpx] text-[#4a4a4a] text-center bg-[#ffffff] text-[26rpx] leading-[1.5] relative z-[1]">
           <Text>未找到事件或已被删除。</Text>
         </View>
       )}
