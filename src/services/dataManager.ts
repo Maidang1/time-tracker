@@ -1,6 +1,4 @@
 import type { EventItem, EventRecord } from '../types/events';
-import { loadAllEventsWithRecords } from '../utils/eventStoreCloud';
-import { createEventInCloud, updateEventInCloud, deleteEventInCloud, createRecordInCloud, updateRecordInCloud, deleteRecordInCloud } from '../services/databaseService';
 
 type DataChangeListener = () => void;
 
@@ -60,7 +58,8 @@ class DataManager {
       return this.initializationPromise;
     }
     
-    return Promise.reject(new Error('DataManager not initialized'));
+    // For now, resolve immediately if not initialized, or we can treat it as initialized empty
+    return Promise.resolve();
   }
 
   async initialize(): Promise<void> {
@@ -70,9 +69,10 @@ class DataManager {
     
     this.initializationPromise = (async () => {
       try {
-        this.events = await loadAllEventsWithRecords();
+        // Redesign: No data loading for now
+        this.events = [];
         this.isInitialized = true;
-        console.log(`数据管理器初始化完成，加载了 ${this.events.length} 个事件`);
+        console.log(`数据管理器初始化完成，暂无数据`);
       } catch (error) {
         console.error('初始化数据管理器失败:', error);
         throw error;
@@ -107,9 +107,7 @@ class DataManager {
     };
 
     try {
-      await createEventInCloud(newEvent);
-      console.log('数据库写入成功，创建事件:', newEvent.id);
-      
+      // In-memory only
       this.events = [newEvent, ...this.events];
       this.notifyListeners();
       
@@ -124,9 +122,6 @@ class DataManager {
     const updatedEvent = { ...event, updatedAt: new Date().toISOString() };
 
     try {
-      await updateEventInCloud(updatedEvent);
-      console.log('数据库写入成功，更新事件:', event.id);
-      
       const index = this.events.findIndex(e => e.id === event.id);
       if (index !== -1) {
         this.events[index] = updatedEvent;
@@ -142,9 +137,6 @@ class DataManager {
 
   async deleteEvent(eventId: number): Promise<boolean> {
     try {
-      await deleteEventInCloud(eventId);
-      console.log('数据库写入成功，删除事件:', eventId);
-      
       const index = this.events.findIndex(e => e.id === eventId);
       if (index !== -1) {
         this.events.splice(index, 1);
@@ -166,9 +158,6 @@ class DataManager {
     };
 
     try {
-      await createRecordInCloud({ ...recordData, eventId });
-      console.log('数据库写入成功，创建记录:', newRecord.id);
-      
       const eventIndex = this.events.findIndex(e => e.id === eventId);
       if (eventIndex !== -1) {
         this.events[eventIndex].records = [newRecord, ...this.events[eventIndex].records];
@@ -184,9 +173,6 @@ class DataManager {
 
   async updateRecord(eventId: number, record: EventRecord): Promise<boolean> {
     try {
-      await updateRecordInCloud({ ...record, eventId });
-      console.log('数据库写入成功，更新记录:', record.id);
-      
       const eventIndex = this.events.findIndex(e => e.id === eventId);
       if (eventIndex !== -1) {
         const recordIndex = this.events[eventIndex].records.findIndex(r => r.id === record.id);
@@ -205,9 +191,6 @@ class DataManager {
 
   async deleteRecord(eventId: number, recordId: number): Promise<boolean> {
     try {
-      await deleteRecordInCloud(recordId, eventId);
-      console.log('数据库写入成功，删除记录:', recordId);
-      
       const eventIndex = this.events.findIndex(e => e.id === eventId);
       if (eventIndex !== -1) {
         const recordIndex = this.events[eventIndex].records.findIndex(r => r.id === recordId);
@@ -233,7 +216,7 @@ class DataManager {
   }
 
   async syncToRemote(): Promise<boolean> {
-    console.log('syncToRemote 调用 - 当前为即时同步模式，无需批量同步');
+    console.log('syncToRemote 调用 - 已移除远程同步功能');
     return true;
   }
 
