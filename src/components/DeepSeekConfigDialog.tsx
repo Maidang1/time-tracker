@@ -33,10 +33,10 @@ export default function DeepSeekConfigDialog({
   return (
     <View className="fixed inset-0 flex items-center justify-center z-[999]">
       <View className="absolute inset-0 bg-[#00000060] backdrop-blur-[2px]" onClick={onClose} />
-      <View className="relative w-[min(90vw,520px)] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[20rpx] z-[1]">
+      <View className="relative w-[80vw] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[20rpx] z-[1]">
         <View className="flex items-center justify-between">
           <Text className="text-[36rpx] font-semibold">配置 DeepSeek</Text>
-          <Button className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0" onClick={onClose}>
+          <Button className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0" onClick={onClose}>
             关闭
           </Button>
         </View>

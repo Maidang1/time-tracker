@@ -202,16 +202,16 @@ export default function Index() {
         }
         right={
           <View className="flex items-center gap-[12rpx]">
-            <Button className="mr-0 border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]" onClick={openSettingsDialog}>
+            <Button className="mr-0 border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]" onClick={openSettingsDialog}>
               设置
             </Button>
             <Button
-              className="mr-0 border-[2rpx] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]"
+              className="mr-0 border-[2rpx] border-solid rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]"
               onClick={openGlobalInsight}
             >
               AI 洞察
             </Button>
-            <Button className="mr-0 border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#f6821f] text-[#ffffff] text-[26rpx]" onClick={openCreateDialog}>
+            <Button className="mr-0 border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#f6821f] text-[#ffffff] text-[26rpx]" onClick={openCreateDialog}>
               新建
             </Button>
           </View>
@@ -278,7 +278,7 @@ export default function Index() {
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">记录新事件</Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setShowCreateDialog(false)}
               >
                 关闭
@@ -315,7 +315,7 @@ export default function Index() {
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">删除事件</Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setPendingDeleteEventId(null)}
               >
                 关闭
@@ -349,7 +349,7 @@ export default function Index() {
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">设置</Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setShowSettingsDialog(false)}
               >
                 关闭
@@ -362,7 +362,7 @@ export default function Index() {
               >
                 修改 DeepSeek 配置
               </Button>
-              <Button className="border-[2rpx] border-[#1a1a1a] rounded-[16rpx] h-[88rpx] leading-[88rpx] bg-[#ffffff] text-[#1a1a1a] text-[28rpx]" onClick={openAboutDialog}>
+              <Button className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[16rpx] h-[88rpx] leading-[88rpx] bg-[#ffffff] text-[#1a1a1a] text-[28rpx]" onClick={openAboutDialog}>
                 关于小程序
               </Button>
             </View>
@@ -380,7 +380,7 @@ export default function Index() {
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">关于小程序</Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setShowAboutDialog(false)}
               >
                 关闭

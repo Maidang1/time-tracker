@@ -106,7 +106,7 @@ export default function AiInsightsPage() {
         }
         right={
           <View className="flex items-center gap-[12rpx]">
-            <Button className="mr-0 border-[2rpx] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]" onClick={() => navigateBack()}>
+            <Button className="mr-0 border-[2rpx] border-solid rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] text-[26rpx] bg-transparent text-[#f6821f] outline-none border-[#f6821f]" onClick={() => navigateBack()}>
               返回
             </Button>
           </View>

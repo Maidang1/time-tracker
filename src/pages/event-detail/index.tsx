@@ -13,7 +13,7 @@ import {
   isDeepSeekConfigured,
   saveDeepSeekConfig,
 } from "../../utils/aiConfig";
-import DataManager, { type SyncErrorCallback } from "../../services/dataManager";
+import DataManager from "../../services/dataManager";
 
 export default function EventDetail() {
   const router = useRouter();
@@ -27,32 +27,37 @@ export default function EventDetail() {
   const [note, setNote] = useState("");
   const [showRecordDialog, setShowRecordDialog] = useState(false);
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
-  const [pendingDeleteRecordId, setPendingDeleteRecordId] = useState<number | null>(null);
+  const [pendingDeleteRecordId, setPendingDeleteRecordId] = useState<
+    number | null
+  >(null);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
   const [configSnapshot, setConfigSnapshot] = useState(getDeepSeekConfig());
   const [isLoading, setIsLoading] = useState(false);
 
-  const showSyncError = useCallback((error: { type: string; message: string; retry?: () => Promise<void> }) => {
-    Taro.showModal({
-      title: '同步失败',
-      content: error.message,
-      confirmText: '重试',
-      cancelText: '忽略',
-      success: async (res) => {
-        if (res.confirm && error.retry) {
-          Taro.showLoading({ title: '重试中...' });
-          try {
-            await error.retry();
-            Taro.showToast({ title: '重试请求已提交', icon: 'none' });
-          } catch (e) {
-            console.error('Retry failed:', e);
-          } finally {
-            Taro.hideLoading();
+  const showSyncError = useCallback(
+    (error: { type: string; message: string; retry?: () => Promise<void> }) => {
+      Taro.showModal({
+        title: "同步失败",
+        content: error.message,
+        confirmText: "重试",
+        cancelText: "忽略",
+        success: async (res) => {
+          if (res.confirm && error.retry) {
+            Taro.showLoading({ title: "重试中..." });
+            try {
+              await error.retry();
+              Taro.showToast({ title: "重试请求已提交", icon: "none" });
+            } catch (e) {
+              console.error("Retry failed:", e);
+            } finally {
+              Taro.hideLoading();
+            }
           }
-        }
-      }
-    });
-  }, []);
+        },
+      });
+    },
+    [],
+  );
 
   // 页面加载时获取事件数据
   useEffect(() => {
@@ -87,7 +92,6 @@ export default function EventDetail() {
 
     return Math.floor(diffMs / 1000 / 60); // 转换为分钟
   }, [startDate, startTime, endDate, endTime]);
-
 
   const openRecordDialog = () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -126,7 +130,9 @@ export default function EventDetail() {
           endTime,
           durationMinutes: pendingDuration,
           note: note.trim(),
-          createdAt: eventData.records.find(r => r.id === editingRecordId)?.createdAt || new Date().toISOString(),
+          createdAt:
+            eventData.records.find((r) => r.id === editingRecordId)
+              ?.createdAt || new Date().toISOString(),
           date: startDate,
         };
 
@@ -166,7 +172,7 @@ export default function EventDetail() {
     if (!eventData || !pendingDeleteRecordId) return;
 
     setIsLoading(true);
-    Taro.showLoading({ title: '删除中...' });
+    Taro.showLoading({ title: "删除中..." });
 
     try {
       await DataManager.deleteRecord(eventId, pendingDeleteRecordId);
@@ -197,7 +203,6 @@ export default function EventDetail() {
     });
   };
 
-
   if (!eventId) {
     return (
       <View className="event-detail">
@@ -220,21 +225,38 @@ export default function EventDetail() {
             left={
               <View className="flex flex-col gap-[4rpx]">
                 <View className="flex items-center gap-[12rpx]">
-                  <View className="w-[64rpx] h-[64rpx] rounded-[18rpx] border-[2rpx] border-[#1a1a1a] flex items-center justify-center text-[26rpx] font-bold bg-[#ffffff]">CP</View>
-                  <Text className="text-[32rpx] font-semibold">{eventData.title}</Text>
+                  <View className="w-[64rpx] h-[64rpx] rounded-[18rpx] border-[2rpx] border-[#1a1a1a] flex items-center justify-center text-[26rpx] font-bold bg-[#ffffff]">
+                    CP
+                  </View>
+                  <Text className="text-[32rpx] font-semibold">
+                    {eventData.title}
+                  </Text>
                 </View>
-                {eventData.description && <Text className="text-[26rpx] text-[#666666] ml-[76rpx]">{eventData.description}</Text>}
+                {eventData.description && (
+                  <Text className="text-[26rpx] text-[#666666] ml-[76rpx]">
+                    {eventData.description}
+                  </Text>
+                )}
               </View>
             }
             right={
               <View className="flex items-center gap-[12rpx]">
-                <Button className="mr-0 border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]" onClick={goToEventInsight}>
+                <Button
+                  className="mr-0 border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]"
+                  onClick={goToEventInsight}
+                >
                   AI 洞察
                 </Button>
-                <Button className="mr-0 border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]" onClick={goToAnalysis}>
+                <Button
+                  className="mr-0 border-solid border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#ffffff] text-[#1a1a1a] text-[26rpx]"
+                  onClick={goToAnalysis}
+                >
                   分析
                 </Button>
-                <Button className="mr-0 border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#f6821f] text-[#ffffff] text-[26rpx]" onClick={openRecordDialog}>
+                <Button
+                  className="mr-0  border-solid border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[24rpx] h-[72rpx] leading-[72rpx] bg-[#f6821f] text-[#ffffff] text-[26rpx]"
+                  onClick={openRecordDialog}
+                >
                   新建
                 </Button>
               </View>
@@ -254,8 +276,12 @@ export default function EventDetail() {
 
           <View className="mt-[16rpx] border-none rounded-0 bg-transparent shadow-none relative z-[1]">
             <View className="flex flex-col items-start gap-[8rpx] pt-[28rpx] px-[0rpx] sm:flex-row sm:items-center sm:justify-between">
-              <Text className="text-[36rpx] font-semibold leading-[1.35]">记录日志</Text>
-              <Text className="text-[26rpx] text-[#888888]">记录按倒序展示</Text>
+              <Text className="text-[36rpx] font-semibold leading-[1.35]">
+                记录日志
+              </Text>
+              <Text className="text-[26rpx] text-[#888888]">
+                记录按倒序展示
+              </Text>
             </View>
 
             <View className="flex flex-col gap-[16rpx] py-[24rpx] pb-[32rpx] pl-[12rpx] relative">
@@ -282,10 +308,10 @@ export default function EventDetail() {
                     <View className="flex items-center justify-between">
                       <Text className="text-[30rpx] font-medium text-[#1a1a1a]">
                         {record.startDate || record.date} {record.startTime}
-                        {(record.endDate && record.endDate !== (record.startDate || record.date))
+                        {record.endDate &&
+                        record.endDate !== (record.startDate || record.date)
                           ? ` — ${record.endDate} ${record.endTime}`
-                          : ` — ${record.endTime}`
-                        }
+                          : ` — ${record.endTime}`}
                       </Text>
                       <Text className="text-[28rpx] font-bold text-[#f6821f]">
                         {formatMinutes(record.durationMinutes)}
@@ -298,7 +324,7 @@ export default function EventDetail() {
                 </SwipeableItem>
               ))}
 
-              {!(eventData.records?.length) && (
+              {!eventData.records?.length && (
                 <View className="ml-[24rpx] border-[2rpx] dashed border-[#888888] rounded-[18rpx] p-[28rpx] text-[#4a4a4a] text-center text-[26rpx] leading-[1.5] bg-[repeating-linear-gradient(-45deg,transparent,transparent_3px,#0000001a_3px,#0000001a_4px)]">
                   <Text>暂无记录，请先在上方添加。</Text>
                 </View>
@@ -318,13 +344,13 @@ export default function EventDetail() {
             className="absolute inset-0 bg-[#00000060] backdrop-blur-[2px]"
             onClick={() => setShowRecordDialog(false)}
           />
-          <View className="relative w-[min(90vw,480px)] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[16rpx] z-[11]">
+          <View className="relative w-[80vw] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[16rpx] z-[11]">
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">
                 {editingRecordId ? "编辑记录" : "新增记录"}
               </Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setShowRecordDialog(false)}
               >
                 关闭
@@ -353,7 +379,7 @@ export default function EventDetail() {
                   </View>
                 </Picker>
               </View>
-              
+
               <View className="flex gap-[16rpx]">
                 <Picker
                   mode="date"
@@ -389,7 +415,11 @@ export default function EventDetail() {
                   {pendingDuration ? formatMinutes(pendingDuration) : "—"}
                 </Text>
               </View>
-              <Button className="bg-[#f6821f] text-[#ffffff] rounded-[16rpx] text-[30rpx] h-[96rpx] leading-[96rpx] w-full shadow-[0_16rpx_28rpx_#f6821f40]" onClick={handleSaveRecord} loading={isLoading}>
+              <Button
+                className="bg-[#f6821f] text-[#ffffff] rounded-[16rpx] text-[30rpx] h-[96rpx] leading-[96rpx] w-full shadow-[0_16rpx_28rpx_#f6821f40]"
+                onClick={handleSaveRecord}
+                loading={isLoading}
+              >
                 {editingRecordId ? "保存修改" : "保存记录"}
               </Button>
             </View>
@@ -403,11 +433,11 @@ export default function EventDetail() {
             className="absolute inset-0 bg-[#00000060] backdrop-blur-[2px]"
             onClick={() => setPendingDeleteRecordId(null)}
           />
-          <View className="relative w-[min(90vw,480px)] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[16rpx] z-[11]">
+          <View className="relative w-[80vw] bg-[#ffffff] border-[2rpx] border-[#1a1a1a] rounded-[20rpx] shadow-[0_30rpx_60rpx_#00000025] p-[28rpx] flex flex-col gap-[16rpx] z-[11]">
             <View className="flex items-center justify-between">
               <Text className="text-[36rpx] font-semibold">删除记录</Text>
               <Button
-                className="border-[2rpx] border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
+                className="border-[2rpx] border-solid border-[#1a1a1a] rounded-[999px] px-[20rpx] h-[64rpx] leading-[64rpx] bg-transparent text-[26rpx] mr-0"
                 onClick={() => setPendingDeleteRecordId(null)}
               >
                 关闭
@@ -423,14 +453,17 @@ export default function EventDetail() {
               >
                 取消
               </Button>
-              <Button className="flex-1 h-[72rpx] leading-[72rpx] rounded-[999px] bg-[#f6821f] shadow-[0_12rpx_24rpx_#f6821f40] text-[#ffffff]" onClick={confirmDeleteRecord} loading={isLoading}>
+              <Button
+                className="flex-1 h-[72rpx] leading-[72rpx] rounded-[999px] bg-[#f6821f] shadow-[0_12rpx_24rpx_#f6821f40] text-[#ffffff]"
+                onClick={confirmDeleteRecord}
+                loading={isLoading}
+              >
                 删除
               </Button>
             </View>
           </View>
         </View>
       )}
-
 
       <DeepSeekConfigDialog
         open={showConfigDialog}
