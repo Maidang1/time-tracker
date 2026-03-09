@@ -1,7 +1,8 @@
 import Taro, { useLaunch } from '@tarojs/taro'
 
-import DataManager from './services/dataManager'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { AppServicesProvider } from './presentation/context/AppServicesContext'
+import { getAppServices } from './infrastructure/bootstrap/appBootstrap'
 import './app.scss'
 
 export default function App({ children }: { children: React.ReactNode }) {
@@ -15,16 +16,18 @@ export default function App({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      await DataManager.initialize()
-      console.log('数据管理器初始化成功')
+      await getAppServices().eventService.initialize()
+      console.log('应用服务初始化成功')
     } catch (error) {
-      console.error('数据管理器初始化失败:', error)
+      console.error('应用服务初始化失败:', error)
     }
   })
 
   return (
-    <ThemeProvider>
-      {children}
-    </ThemeProvider>
+    <AppServicesProvider>
+      <ThemeProvider>
+        {children}
+      </ThemeProvider>
+    </AppServicesProvider>
   )
 }
