@@ -3,7 +3,7 @@ import { Button, Input, Picker, Text, View } from "@tarojs/components";
 import Taro, { useRouter, useDidShow } from "@tarojs/taro";
 
 import type { EventRecord } from "../../types/events";
-import { formatMinutes } from "../../utils/time";
+import { formatLocalDate, formatMinutes } from "../../utils/time";
 import PageHeader from "../../components/PageHeader";
 import HeaderMeta from "../../components/HeaderMeta";
 import SwipeableItem from "../../components/SwipeableItem";
@@ -129,8 +129,10 @@ export default function EventDetail() {
 
     // 计算连续打卡天数
     let consecutiveDays = 0;
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const today = formatLocalDate(new Date());
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterday = formatLocalDate(yesterdayDate);
 
     // 检查最近一次打卡是否是今天或昨天（允许今天还没打卡但昨天打了卡）
     const firstDate = checkinDates[0];
@@ -162,7 +164,7 @@ export default function EventDetail() {
   const handleCheckin = async () => {
     if (!eventData) return;
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = formatLocalDate(new Date());
 
     // 检查今天是否已经打卡
     const alreadyCheckedIn = eventData.records?.some(
@@ -197,7 +199,7 @@ export default function EventDetail() {
   };
 
   const openRecordDialog = () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = formatLocalDate(new Date());
     if (eventData?.type === 'time') {
       setStartDate(today);
       setEndDate(today);
