@@ -82,7 +82,7 @@ class DataManager {
           // Sanitize loaded events to ensure records array exists
           this.events = storedEvents.map((e: EventItem) => ({
             ...e,
-            type: e.type || 'time-tracking',  // 向后兼容：默认为时间记录类型
+            type: e.type || 'time',  // 向后兼容：默认为时间记录类型
             records: Array.isArray(e.records) ? e.records : []
           }));
           // Notify immediately to show data
@@ -268,7 +268,7 @@ class DataManager {
 
         // 2. Ensure records array exists and sort
         allCloudEvents.forEach(event => {
-            event.type = event.type || 'time-tracking';  // 向后兼容：默认为时间记录类型
+            event.type = event.type || 'time';  // 向后兼容：默认为时间记录类型
             event.records = Array.isArray(event.records) ? event.records : [];
             // Sort records by date/time desc if needed
             event.records.sort((a, b) => {
@@ -340,7 +340,7 @@ class DataManager {
     return event ? [...event.records] : [];
   }
 
-  async createEvent(title: string, description: string, type: EventType = 'time-tracking'): Promise<EventItem | null> {
+  async createEvent(title: string, description: string, type: EventType = 'time'): Promise<EventItem | null> {
     const now = new Date();
     const newEvent: EventItem = {
       id: Date.now(),
@@ -426,7 +426,7 @@ class DataManager {
     if (!event) return null;
 
     // 验证：时间记录类型必须有时间字段
-    if (event.type === 'time-tracking') {
+    if (event.type === 'time') {
       if (!recordData.startDate || !recordData.startTime ||
           !recordData.endDate || !recordData.endTime) {
         throw new Error('时间记录类型必须填写完整的时间信息');

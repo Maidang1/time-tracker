@@ -16,7 +16,7 @@ export default function Index() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [eventType, setEventType] = useState<EventType>("time-tracking");
+  const [eventType, setEventType] = useState<EventType>("time");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingEventId, setEditingEventId] = useState<number | null>(null);
   const [pendingDeleteEventId, setPendingDeleteEventId] = useState<
@@ -133,7 +133,7 @@ export default function Index() {
   const openCreateDialog = () => {
     setTitle("");
     setDescription("");
-    setEventType("time-tracking");
+    setEventType("time");
     setEditingEventId(null);
     setShowCreateDialog(true);
   };
@@ -384,13 +384,23 @@ export default function Index() {
                 <View className="flex gap-[16rpx]">
                   <Button
                     className={`flex-1 h-[96rpx] rounded-[16rpx] text-[30rpx] ${
-                      eventType === "time-tracking"
+                      eventType === "time"
                         ? themeStyles.primaryButton
                         : themeStyles.secondaryButton
                     }`}
-                    onClick={() => setEventType("time-tracking")}
+                    onClick={() => setEventType("time")}
                   >
                     时间
+                  </Button>
+                  <Button
+                    className={`flex-1 h-[96rpx] rounded-[16rpx] text-[30rpx] ${
+                      eventType === "checkin"
+                        ? themeStyles.primaryButton
+                        : themeStyles.secondaryButton
+                    }`}
+                    onClick={() => setEventType("checkin")}
+                  >
+                    打卡
                   </Button>
                   <Button
                     className={`flex-1 h-[96rpx] rounded-[16rpx] text-[30rpx] ${
