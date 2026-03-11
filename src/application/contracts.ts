@@ -24,7 +24,9 @@ export interface SyncTaskRepository {
   save(tasks: SyncTask[]): Promise<void>
 }
 
-export interface RemoteSyncGateway {
+export interface RemoteEventStore {
+  initialize(): Promise<void>
   pullEvents(): Promise<EventItem[]>
-  pushTask(task: SyncTask): Promise<void>
+  upsertEvent(event: EventItem): Promise<void>
+  deleteEvent(eventId: number): Promise<void>
 }

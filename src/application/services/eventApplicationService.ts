@@ -1,7 +1,7 @@
 import type {
   CommandResult,
   EventRepository,
-  RemoteSyncGateway,
+  RemoteEventStore,
   SyncTask,
   SyncTaskRepository,
 } from '../contracts'
@@ -37,7 +37,7 @@ export class EventApplicationService {
   constructor(
     private readonly eventRepository: EventRepository,
     private readonly syncTaskRepository: SyncTaskRepository,
-    private readonly syncGateway: RemoteSyncGateway,
+    private readonly remoteEventStore: RemoteEventStore,
     private readonly store: AppStore,
   ) {}
 
@@ -53,6 +53,15 @@ export class EventApplicationService {
       initialized: true,
       lastError: null,
     })
+
+    try {
+      await this.remoteEventStore.initialize()
+    } catch (error) {
+      this.store.setState({
+        lastError: error instanceof Error ? error.message : '远端存储初始化失败',
+      })
+      return
+    }
 
     void this.refreshFromRemote()
     if (tasks.length > 0) {
@@ -279,7 +288,7 @@ export class EventApplicationService {
 
   async refreshFromRemote() {
     try {
-      const remoteEvents = await this.syncGateway.pullEvents()
+      const remoteEvents = await this.remoteEventStore.pullEvents()
       const tasks = await this.syncTaskRepository.load()
       const merged = mergeRemoteEvents(this.getState().events, remoteEvents, tasks)
       await this.eventRepository.save(merged)
@@ -315,7 +324,20 @@ export class EventApplicationService {
       while (tasks.length > 0) {
         const task = tasks[0]
         try {
-          await this.syncGateway.pushTask(task)
+          switch (task.type) {
+            case 'delete':
+              await this.remoteEventStore.deleteEvent(task.eventId)
+              break
+            case 'upsert':
+              if (!task.payload) {
+                throw new Error('upsert 同步任务缺少 payload')
+              }
+              await this.remoteEventStore.upsertEvent(task.payload)
+              break
+            default:
+              throw new Error(`未知同步任务类型: ${(task as SyncTask).type}`)
+          }
+
           tasks = tasks.slice(1)
           await this.syncTaskRepository.save(tasks)
           this.store.setState({ pendingTasks: tasks.length })

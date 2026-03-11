@@ -1,20 +1,30 @@
 import { AnalyticsService } from '../../application/services/analyticsService'
 import { EventApplicationService } from '../../application/services/eventApplicationService'
-import { TaroCloudSyncGateway } from '../gateways/taroCloudSyncGateway'
+import Taro from '@tarojs/taro'
+import { NoopRemoteEventStore } from '../gateways/noopRemoteEventStore'
+import { TaroCloudEventStore } from '../gateways/taroCloudEventStore'
 import { LocalEventRepository, LocalSyncTaskRepository } from '../repositories/localStorageRepositories'
 import { AppStore } from '../../presentation/state/appStore'
 
 export type AppServices = ReturnType<typeof createAppServices>
 
+const createRemoteEventStore = () => {
+  if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP && Taro.cloud) {
+    return new TaroCloudEventStore()
+  }
+
+  return new NoopRemoteEventStore()
+}
+
 export const createAppServices = () => {
   const store = new AppStore()
   const eventRepository = new LocalEventRepository()
   const syncTaskRepository = new LocalSyncTaskRepository()
-  const syncGateway = new TaroCloudSyncGateway()
+  const remoteEventStore = createRemoteEventStore()
   const eventService = new EventApplicationService(
     eventRepository,
     syncTaskRepository,
-    syncGateway,
+    remoteEventStore,
     store,
   )
   const analyticsService = new AnalyticsService()

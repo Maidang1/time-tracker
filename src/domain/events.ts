@@ -41,8 +41,6 @@ export type TodoRecord = BaseRecord & {
 export type EventRecord = TimeRecord | CheckinRecord | TodoRecord
 
 type BaseEvent<TType extends EventType, TRecord extends EventRecord> = {
-  _id?: string
-  _openid?: string
   id: number
   title: string
   description: string
@@ -428,8 +426,6 @@ export const normalizeEvent = (rawEvent: any): EventItem => {
       : createdAt
 
   const base = {
-    _id: rawEvent?._id,
-    _openid: rawEvent?._openid,
     id: Number(rawEvent?.id) || Date.now(),
     title: typeof rawEvent?.title === 'string' ? rawEvent.title : '未命名事件',
     description: typeof rawEvent?.description === 'string' ? rawEvent.description : '',
