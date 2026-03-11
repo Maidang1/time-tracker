@@ -1,6 +1,8 @@
 import { AnalyticsService } from '../../application/services/analyticsService'
 import { EventApplicationService } from '../../application/services/eventApplicationService'
 import Taro from '@tarojs/taro'
+import { getRemoteStoreConfig } from '../config/remoteStoreConfig'
+import { GitHubRemoteEventStore } from '../gateways/githubRemoteEventStore'
 import { NoopRemoteEventStore } from '../gateways/noopRemoteEventStore'
 import { TaroCloudEventStore } from '../gateways/taroCloudEventStore'
 import { LocalEventRepository, LocalSyncTaskRepository } from '../repositories/localStorageRepositories'
@@ -9,11 +11,16 @@ import { AppStore } from '../../presentation/state/appStore'
 export type AppServices = ReturnType<typeof createAppServices>
 
 const createRemoteEventStore = () => {
-  if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP && Taro.cloud) {
-    return new TaroCloudEventStore()
-  }
+  const config = getRemoteStoreConfig(Taro.getEnv() === Taro.ENV_TYPE.WEAPP && !!Taro.cloud)
 
-  return new NoopRemoteEventStore()
+  switch (config.provider) {
+    case 'github':
+      return new GitHubRemoteEventStore(config)
+    case 'wechat-cloud':
+      return new TaroCloudEventStore()
+    default:
+      return new NoopRemoteEventStore()
+  }
 }
 
 export const createAppServices = () => {

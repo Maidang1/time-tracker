@@ -11,6 +11,14 @@ declare module '*.scss';
 declare module '*.sass';
 declare module '*.styl';
 
+declare const CLOUD_ENV_ID: string;
+declare const REMOTE_STORE_PROVIDER: string;
+declare const GITHUB_SYNC_OWNER: string;
+declare const GITHUB_SYNC_REPO: string;
+declare const GITHUB_SYNC_BRANCH: string;
+declare const GITHUB_SYNC_FILE_PATH: string;
+declare const GITHUB_SYNC_TOKEN: string;
+
 declare namespace NodeJS {
   interface ProcessEnv {
     /** NODE 内置环境变量, 会影响到最终构建生成产物 */
@@ -25,5 +33,4 @@ declare namespace NodeJS {
     TARO_APP_ID: string
   }
 }
-
 

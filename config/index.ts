@@ -23,6 +23,12 @@ export default defineConfig<'webpack5'>(async merge => {
     ],
     defineConstants: {
       CLOUD_ENV_ID: JSON.stringify(process.env.WECHAT_CLOUD_ENV_ID || ''),
+      REMOTE_STORE_PROVIDER: JSON.stringify(process.env.REMOTE_STORE_PROVIDER || ''),
+      GITHUB_SYNC_OWNER: JSON.stringify(process.env.GITHUB_SYNC_OWNER || ''),
+      GITHUB_SYNC_REPO: JSON.stringify(process.env.GITHUB_SYNC_REPO || ''),
+      GITHUB_SYNC_BRANCH: JSON.stringify(process.env.GITHUB_SYNC_BRANCH || 'main'),
+      GITHUB_SYNC_FILE_PATH: JSON.stringify(process.env.GITHUB_SYNC_FILE_PATH || 'chrono-pulse/events.json'),
+      GITHUB_SYNC_TOKEN: JSON.stringify(process.env.GITHUB_SYNC_TOKEN || ''),
     },
     copy: {
       patterns: [
